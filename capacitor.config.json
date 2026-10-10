@@ -1,0 +1,14 @@
+{
+  "appId": "com.angel.migym",
+  "appName": "Mi Gym",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_migym",
+      "iconColor": "#2F7BF5"
+    }
+  }
+}
