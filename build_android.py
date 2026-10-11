@@ -7,11 +7,40 @@ DARK = (18, 18, 18, 255)
 WHITE = (255, 255, 255, 255)
 
 
+def photos():
+    """Descarga las fotos de los ejercicios (free-exercise-db, dominio público) para que funcionen sin internet."""
+    import io, json, time, urllib.request
+    from PIL import Image
+    html = open("index.html", encoding="utf-8").read()
+    m = re.search(r'<script id="photo-map" type="application/json">(.*?)</script>', html, re.S)
+    if not m:
+        return
+    slugs = sorted(set(json.loads(m.group(1)).values()))
+    base = "https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/"
+    ok = 0
+    for s in slugs:
+        os.makedirs(f"www/img/{s}", exist_ok=True)
+        for i in (0, 1):
+            for intento in range(3):
+                try:
+                    data = urllib.request.urlopen(f"{base}{s}/{i}.jpg", timeout=30).read()
+                    im = Image.open(io.BytesIO(data)).convert("RGB")
+                    im.thumbnail((480, 480))
+                    im.save(f"www/img/{s}/{i}.jpg", quality=72, optimize=True)
+                    ok += 1
+                    break
+                except Exception as e:
+                    print("reintento", s, i, e)
+                    time.sleep(2)
+    print(f"fotos descargadas: {ok} de {len(slugs) * 2}")
+
+
 def web():
     os.makedirs("www", exist_ok=True)
     for f in WEB:
         if os.path.exists(f):
             shutil.copy(f, os.path.join("www", f))
+    photos()
     print("web lista")
 
 
